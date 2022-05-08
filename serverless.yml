@@ -4,8 +4,8 @@ frameworkVersion: ">=1.1.0"
 
 provider:
   name: aws
-  runtime: nodejs12.x # python3.6
-  profile: hackathon
+  runtime: python3.6
+  profile: default
   region: us-east-1
   environment:
     DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
@@ -28,7 +28,7 @@ functions:
     timeout: 30
     events:
       - s3:
-          bucket: bucketname # Escolha o nome do seu bucket que deve ser único
+          bucket: bucket-jpportocampos
           event: s3:ObjectCreated:*
           rules:
             - prefix: uploads/
@@ -39,10 +39,30 @@ functions:
     memorySize: 128
     timeout: 30
     events:
-      - http:
+      - http: 
           path: images/{s3objectkey}
           method: get
           cors: true
+  getImage:
+    handler: handler.getImage
+    description:
+    memorySize: 128
+    timeout: 30
+    events:
+      - http: 
+          path: images/download/{s3objectkey}
+          method: get
+          cors: true  
+  InfoImages:
+    handler: handler.InfoImages
+    description:
+    memorySize: 128
+    timeout: 30
+    events:
+      - http: 
+          path: images/info
+          method: get
+          cors: true                
 
 resources:
   Resources:
@@ -53,6 +73,7 @@ resources:
           -
             AttributeName: s3objectkey
             AttributeType: S
+
         KeySchema:
           -
             AttributeName: s3objectkey
